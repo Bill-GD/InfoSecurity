@@ -39,8 +39,8 @@ def decrypt(cipherText: str, key: str):
 
 
 if __name__ == '__main__':
-    plainText = 'L'
-    key = 'H'
+    plainText = input('Plain text: ')
+    key = input('Key: ')
     
     # seems to work most of the time
     # if encoded binary is > 30 -> mod 26 -> original binary is lost -> different decoded message

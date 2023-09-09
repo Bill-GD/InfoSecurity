@@ -17,5 +17,7 @@ def decrypt(cipherText: str, key: str):
     return p
 
 if __name__ == '__main__':
-    print(encrypt('wearediscoveredsaveyourself', 'deceptive'))
-    print(decrypt('ZICVTWQNGRZGVTWAVZHCQYGLMGJ', 'deceptive'))
+    key = input('Enter key: ')
+    cipher = encrypt(input('Enter plain text: '), key)
+    print(cipher)
+    print(decrypt(cipher, key))
