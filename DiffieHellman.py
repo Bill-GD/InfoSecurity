@@ -1,4 +1,5 @@
 from math import sqrt
+import random
 
 
 def is_prime(n: int) -> bool:
@@ -46,23 +47,32 @@ def num_of_coprimes(n: int):
 
 
 def is_primitive_root(p: int, n: int):
-    if p > n:
-        raise Exception('p has to be less than n')
-    prime_factors, num_coprimes = get_prime_factors(n), num_of_coprimes(n)
-    for i in prime_factors:
-        if (p ** (num_coprimes / i)) % n == 1:
-            return False
-    return True
+    coprimes, num_coprimes = get_coprimes(n), num_of_coprimes(n)
+    if p > n or p not in coprimes:
+        raise Exception('p is invalid')
+    for i in range(1, num_coprimes + 1):
+        if (p ** i) % n == 1:
+            return i == num_coprimes
+    return False
 
 
-def generate_keys(p: int, a: int, xa: int, xb: int):
+def find_all_primitive_roots(n: int):
+    res = []
+    for i in get_coprimes(n):
+        if is_primitive_root(i, n):
+            res.append(i)
+    return res
+
+
+def generate_keys(p: int, xa: int, xb: int):
     if not is_prime(p):
         raise Exception(f'p must be prime, p: {p}')
-    if not is_primitive_root(a, p):
-        raise Exception(f'a ({a}) is not primitive root of p ({p})')
     if xa > p or xb > p:
         raise Exception(f'xa ({xa}) and xb ({xb}) has to be less than p ({p})')
 
+    primitive_roots = find_all_primitive_roots(p)
+    a = primitive_roots[random.randint(0, len(primitive_roots) - 1)]
+    
     ya, yb = (a ** xa) % p, (a ** xb) % p
     key_a, key_b = (yb ** xa) % p, (ya ** xb) % p
     if key_a != key_b:
@@ -71,4 +81,4 @@ def generate_keys(p: int, a: int, xa: int, xb: int):
 
 
 if __name__ == "__main__":
-    print(generate_keys(353, 3, 97, 233))
+    print(generate_keys(353, 97, 233))

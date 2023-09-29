@@ -1,4 +1,5 @@
 from math import sqrt
+import random
 
 
 def is_prime(n: int) -> bool:
@@ -46,34 +47,42 @@ def num_of_coprimes(n: int):
 
 
 def is_primitive_root(p: int, n: int):
-    if p > n:
-        raise Exception('p has to be less than n')
-    prime_factors, num_coprimes = get_prime_factors(n), num_of_coprimes(n)
-    for i in prime_factors:
-        if (p ** (num_coprimes / i)) % n == 1:
-            return False
-    return True
+    coprimes, num_coprimes = get_coprimes(n), num_of_coprimes(n)
+    if p > n or p not in coprimes:
+        raise Exception('p is invalid')
+    for i in range(1, num_coprimes + 1):
+        if (p ** i) % n == 1:
+            return i == num_coprimes
+    return False
 
 
-def generate_keys(q: int, a: int, xa: int):
+def find_all_primitive_roots(n: int):
+    res = []
+    for i in get_coprimes(n):
+        if is_primitive_root(i, n):
+            res.append(i)
+    return res
+
+
+def generate_keys(q: int, xa: int):
     if not is_prime(q):
         raise Exception(f'q must be prime, q: {q}')
-    if not is_primitive_root(a, q):
-        raise Exception(f'a ({a}) is not primitive root of q ({q})')
     if xa >= q - 1:
         raise Exception(f'xa ({xa}) has to be less than q - 1 ({q - 1})')
-
+    primitive_roots = find_all_primitive_roots(q)
+    a = primitive_roots[random.randint(0, len(primitive_roots) - 1)]
     ya = (a ** xa) % q
     return {'public': {'q': q, 'a': a, 'ya': ya}, 'private': xa}
 
 
-def encrypt(p: int, q: int, a: int, xa: int) -> tuple[int, int]:
+def encrypt(p: int, q: int, xa: int) -> tuple[int, int]:
     if p >= q:
         raise Exception(f'p ({p}) must be less than q ({q})')
-    keys = generate_keys(q, a, xa)
+    keys = generate_keys(q, xa)
+    print(keys)
     k = 6
     onetime_k = (keys['public']['ya'] ** k) % q
-    c1, c2 = (a ** k) % q, (onetime_k * p) % q
+    c1, c2 = (keys['public']['a'] ** k) % q, (onetime_k * p) % q
     return c1, c2
 
 
@@ -90,9 +99,8 @@ def decrypt(c: tuple[int, int], q: int, xa: int):
 
 
 if __name__ == "__main__":
-    q, a = 353, 3
-    xa = 10
-    print(generate_keys(q, a, xa))
-    encrypted = encrypt(352, q, a, xa)
+    q = 353 # public
+    xa = 10 # private
+    encrypted = encrypt(123, q, xa)
     print('encrypted:', encrypted)
     print('decrypted:', decrypt(encrypted, q, xa))
