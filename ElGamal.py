@@ -71,18 +71,19 @@ def generate_keys(q: int, xa: int):
         raise Exception(f'xa ({xa}) has to be less than q - 1 ({q - 1})')
     primitive_roots = find_all_primitive_roots(q)
     a = primitive_roots[random.randint(0, len(primitive_roots) - 1)]
+    print('alpha:', a)
     ya = (a ** xa) % q
-    return {'public': {'q': q, 'a': a, 'ya': ya}, 'private': xa}
+    return {'public': {'q': q, 'ya': ya}, 'private': {'xa': xa, 'a': a}}
 
 
 def encrypt(p: int, q: int, xa: int) -> tuple[int, int]:
     if p >= q:
         raise Exception(f'p ({p}) must be less than q ({q})')
     keys = generate_keys(q, xa)
-    print(keys)
+    # print(keys)
     k = 6
     onetime_k = (keys['public']['ya'] ** k) % q
-    c1, c2 = (keys['public']['a'] ** k) % q, (onetime_k * p) % q
+    c1, c2 = (keys['private']['a'] ** k) % q, (onetime_k * p) % q
     return c1, c2
 
 
@@ -99,8 +100,9 @@ def decrypt(c: tuple[int, int], q: int, xa: int):
 
 
 if __name__ == "__main__":
-    q = 353 # public
-    xa = 10 # private
-    encrypted = encrypt(123, q, xa)
+    q = 467  # public
+    xa = 10  # private
+    plain = [ord(c) for c in 'how are you?']
+    encrypted = [encrypt(c, q, xa) for c in plain]
     print('encrypted:', encrypted)
-    print('decrypted:', decrypt(encrypted, q, xa))
+    print('decrypted:', ''.join([chr(decrypt(en, q, xa)) for en in encrypted]))

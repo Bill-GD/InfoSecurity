@@ -28,10 +28,10 @@ def encrypt(plainText: str, key: int):
 
 
 if __name__ == '__main__':
-    print('Brute force Caesar')
+    # print('Brute force Caesar')
     # encrypt(input('Enter plain text: '), int(input('Enter key: ')))
-    brute_force('syfxuh')
-    print()
+    # brute_force('syfxuh')
+    # print()
     print(decrypt('syfxuh', 16))
     print(decrypt('TRVJRI TZGYVIJ RIV HLZKV VRJP KF TIRTB', 17))
     print(encrypt('CAESAR CIPHERS ARE QUITE EASY TO CRACK', 17))

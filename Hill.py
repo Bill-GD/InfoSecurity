@@ -134,14 +134,14 @@ if __name__ == '__main__':
     # plainText = 'help'
     # key = 'ddcf'
     # key_size = 2
-    
+
     plainText = input('Plain text: ')
     key_en = input('Key: ')
     key_en_size = int(input('Size of key matrix: '))
+    print(f'Encrypted: {encrypt(plainText, key_en, key_en_size)}')
 
     cipherText = input('Cipher text: ')
     key_de = input('Key: ')
     key_de_size = int(input('Size of key matrix: '))
 
-    print(f'Encrypted: {encrypt(plainText, key_en, key_en_size)}')
     print(f'Decrypted: {decrypt(cipherText, key_de, key_de_size)}')

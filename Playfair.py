@@ -1,7 +1,7 @@
 def generate_key(key: str):
     if contains(key, 'I') and contains(key, 'J'):
         return 'Invalid key'
-    
+
     key = key.upper()
     k = []
     for i in key:
@@ -68,16 +68,12 @@ def encrypt(plainText: str, key: str):
         }
         # same column
         if coords['first']['x'] == coords['second']['x']:
-            pair[0] = table[(coords['first']['y'] + 1) %
-                            5][coords['first']['x']]
-            pair[1] = table[(coords['second']['y'] + 1) %
-                            5][coords['second']['x']]
+            pair[0] = table[(coords['first']['y'] + 1) % 5][coords['first']['x']]
+            pair[1] = table[(coords['second']['y'] + 1) %5][coords['second']['x']]
         # same row
         elif coords['first']['y'] == coords['second']['y']:
-            pair[0] = table[coords['first']['y']
-                            ][(coords['first']['x'] + 1) % 5]
-            pair[1] = table[coords['second']['y']
-                            ][(coords['second']['x'] + 1) % 5]
+            pair[0] = table[coords['first']['y']][(coords['first']['x'] + 1) % 5]
+            pair[1] = table[coords['second']['y']][(coords['second']['x'] + 1) % 5]
         # rect
         else:
             pair[0] = table[coords['first']['y']][coords['second']['x']]

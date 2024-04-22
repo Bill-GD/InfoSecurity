@@ -144,21 +144,10 @@ def galois(hex_list1: list[str], hex_list2: list[str]):
     return hex(int(result, 2))[2:].zfill(2)
 
 
-def mix_column(shifted_row: list[list[str]]):
+def mix_column(shifted_row: list[list[str]], mix_mat: list[list[str]]):
     shifted_row = transpose(shifted_row)
     result_mat = []
-    for row1 in mix_column_mat:
-        result_row = []
-        for row2 in shifted_row:
-            result_row.append(galois(row1, row2))
-        result_mat.append(result_row)
-    return result_mat
-
-
-def inverse_mix_column(shifted_row: list[list[str]]):
-    shifted_row = transpose(shifted_row)
-    result_mat = []
-    for row1 in inverse_mix_column_mat:
+    for row1 in mix_mat:
         result_row = []
         for row2 in shifted_row:
             result_row.append(galois(row1, row2))
@@ -167,11 +156,13 @@ def inverse_mix_column(shifted_row: list[list[str]]):
 
 
 def plain_matrix(plain_hex: str):
-    return transpose([[plain_hex[i:i+2] for i in range(row, row + 8, 2)] for row in range(0, len(plain_hex), 8)])
+    length_factor = int(len(plain_hex) / 16)
+    return transpose([[plain_hex[i:i+length_factor] for i in range(row, row + 8, length_factor)] for row in range(0, len(plain_hex), 8)])
 
 
 def round_zero_key(key_hex: str):
-    return [[key_hex[i:i+2] for i in range(row, row + 8, 2)] for row in range(0, len(key_hex), 8)]
+    length_factor = int(len(plain_hex) / 16)
+    return [[key_hex[i:i+length_factor] for i in range(row, row + 8, length_factor)] for row in range(0, len(key_hex), 8)]
 
 
 def xor(key1: list[str], key2: list[str]):
@@ -238,7 +229,7 @@ def encode_round(plain: list[list[str]], key: list[list[str]], round: int):
         subbytes = [process_s_box(row) for row in plain]
         shiftrow = [rotate_key(subbytes[row], row)
                     for row in range(len(subbytes))]
-        mixcol = mix_column(shiftrow)
+        mixcol = mix_column(shiftrow, mix_column_mat)
         add_roundkey = add_round_key(mixcol, key)
         return add_roundkey
 
@@ -246,6 +237,7 @@ def encode_round(plain: list[list[str]], key: list[list[str]], round: int):
 def encrypt(plain_hex: str, key_hex: str):
     plain_mat = plain_matrix(plain_hex)
     round_zero = round_zero_key(key_hex)
+    print('round zero:', round_zero)
 
     round_keys = [transpose(round_zero)] + other_round_keys(round_zero)
     prev = plain_mat
@@ -273,7 +265,7 @@ def decode_round(cipher: list[list[str]], key: list[list[str]], round: int):
                         for row in range(len(cipher))]
         inv_subbytes = [inverse_s_box(row) for row in inv_shiftrow]
         add_roundkey = add_round_key(inv_subbytes, key)
-        inv_mixcol = inverse_mix_column(add_roundkey)
+        inv_mixcol = mix_column(add_roundkey, inverse_mix_column_mat)
         return inv_mixcol
 
 
@@ -290,11 +282,25 @@ def decrypt(cipher_hex: str, key_hex: str):
     return ''.join([hex for row in transpose(prev) for hex in row])
 
 
+def check_hex_string(hex: str):
+    for digit in hex:
+        if digit.isdigit():
+            continue
+        if ord(str(digit.upper())) < 65 or ord(str(digit.upper())) > 70:
+            raise Exception(f'Invalid hex value: {digit}')
+
+
 if __name__ == "__main__":
-    plain_hex = '0123456789abcdeffedcba9876543210'
+    # plain_hex = '0123456789abcdeffedcba9876543210'
     # plain_hex = '54776F204F6E65204E696E652054776F'
-    key_hex = '0f1571c947d9e8590cb7add6af7f6798'
+    # key_hex = '0f1571c947d9e8590cb7add6af7f6798'
     # key_hex = '5468617473206d79204b756e67204675'
+
+    plain_hex = input('Input plain: ')
+    check_hex_string(plain_hex)
+
+    key_hex = input('Key: ')
+    check_hex_string(key_hex)
 
     print('plain:', plain_hex)
     print('key:', key_hex)

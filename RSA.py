@@ -22,6 +22,9 @@ def generate_keys(p: int, q: int, e: int):
             f'p and q must be prime, p: {is_prime(p)}, q: {is_prime(q)}')
     n = p * q
     phi = (p - 1) * (q - 1)
+    print('phi;', phi)
+    if e <= 1 or e >= phi:
+        raise Exception(f'Invalid e value, e = {e} (1 < e < phi ({phi}))')
     if gcd(phi, e) != 1:
         raise Exception(f'Invalid e value, gcd(phi, e) = {gcd(phi, e)} != 1')
     d = int(phi / e)
@@ -53,6 +56,7 @@ def decimal_to_text(decimals: list[int]):
 
 def encrypt(text: str, e: int, n: int):
     # p^e % n
+    print([str(pow(char, e) % n) for char in text_to_decimal(text)])
     return ' '.join([str(pow(char, e) % n) for char in text_to_decimal(text)])
 
 
@@ -62,9 +66,14 @@ def decrypt(cipher: str, d: int, n: int):
 
 
 if __name__ == "__main__":
-    keys = generate_keys(73, 157, 7)
-    print(keys)
-    plain = "How are you"
+    # keys = generate_keys(73, 157, 7)
+    # print(keys)
+    # plain = "How are you"
+    plain = input('Plain text: ')
+    key_p = int(input('p: '))
+    key_q = int(input('q: '))
+    key_e = int(input('e: '))
+    keys = generate_keys(key_p, key_q, key_e)
 
     encrypted = encrypt(plain, keys['public']['e'], keys['public']['n'])
     print(encrypted)
